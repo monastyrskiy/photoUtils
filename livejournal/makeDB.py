@@ -3,7 +3,7 @@
 
 import sqlite3
 
-db = '/media/sf_Dropbox/workspace/photoUtils/livejournal/livejournal.db'
+db = 'livejournal.db'
 conn = sqlite3.connect(db)
 
 conn.execute('DROP TABLE IF EXISTS users')

@@ -7,8 +7,8 @@ import html5lib
 import sqlite3
 import liveJournalBot
 from datetime import date, datetime
-
-DB = '/media/sf_Dropbox/workspace/photoUtils/livejournal/livejournal.db'
+from os import path
+from string import split
 
 
 def grpoupsParser():
@@ -17,7 +17,7 @@ def grpoupsParser():
     url = 'livejournal.com'
     args = '/profile/friendlist?socconns=friends&mode_full_socconns=1'
 
-    connection = sqlite3.connect(DB)
+    connection = sqlite3.connect(getScriptPwd() + 'livejournal.db')
     #connection.execute('delete from users')
     cursor = connection.cursor()
 
@@ -72,16 +72,15 @@ def addFriends():
         LIMIT 5
         '''
 
-    connection = sqlite3.connect(DB)
+    connection = sqlite3.connect(getScriptPwd() + 'livejournal.db')
     connection.row_factory = sqlite3.Row
-
     cursor = connection.cursor()
 
     for journal in cursor.execute('SELECT * FROM journals'):
 
         lj = liveJournalBot.LJbot(journal['login'], journal['password'])
 
-        for user in cursor.execute(sql):
+        for user in connection.cursor().execute(sql):
             dt = date.today().isoformat()
             try:
                 lj.addFriend(user['name'])
@@ -94,6 +93,7 @@ def addFriends():
                 pass
             connection.execute('''INSERT INTO friends
                 VALUES (?, ?, ?)''', (user['user_id'], journal['journal_id'], dt))
+
         lj.logout()
 
     connection.commit()
@@ -101,9 +101,21 @@ def addFriends():
 
 
 def log(message=''):
-    fh = open('/home/monastyrskiy/Dropbox/workspace/photoUtils/livejournal/livejournal.log', 'a')
+    fh = open('/var/log/livejournal.log', 'a')
     fh.writelines(message.encode('utf-8'))
     fh.close()
+
+
+def getScriptPwd():
+    pwd = ''
+    scriptpath = path.abspath(__file__)
+    dirs = split(scriptpath, '/')
+    for dir in dirs:
+        if dir == dirs[-1]:
+            break
+        pwd += '%s/' % dir
+
+    return pwd
 
 
 def main():
@@ -115,5 +127,6 @@ def main():
         addFriends()
     else:
         print 'Wrong argument %s!' % argv[1]
+
 if __name__ == '__main__':
     main()

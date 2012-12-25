@@ -12,8 +12,8 @@ class Photo():
     """docstring for Photo"""
     URL = 'http://monastyrskiy.ru'
     HOST = 'monastyrskiy.ru'
-    USER = 'dlm123'
-    PASS = 'Dlmasd123!'
+    USER = ''
+    PASS = ''
 
     FTP_PWD = argv[1]
     LOCAL_PWD = argv[2]

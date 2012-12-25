@@ -7,8 +7,8 @@ use Data::Dumper;
 
 my $URL  = 'http://monastyrskiy.ru';
 my $host = 'monastyrskiy.ru';
-my $user = 'dlm123';
-my $pass = 'Dlmasd123!';
+my $user = '';
+my $pass = '';
 my $pwd  = shift;
 my $ftp  = Net::FTP->new($host) || die "Cannot connect to $host\n";
 

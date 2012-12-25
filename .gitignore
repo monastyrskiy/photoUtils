@@ -36,4 +36,5 @@ nosetests.xml
 
 *.db
 *~
+.log
 
