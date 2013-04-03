@@ -72,14 +72,41 @@ def addFriends():
         LIMIT 5
         '''
 
+    friendsSql = '''
+        select
+            users.name as name, users.user_id as user_id
+        from
+            friends, users
+        where
+            users.user_id = friends.user_id and friends.add_date < date('now', '-5 day')
+            and friends.journal_id = ?
+        ORDER BY RANDOM()
+        limit 6
+    '''
+
     connection = sqlite3.connect(getScriptPwd() + 'livejournal.db')
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
 
     for journal in cursor.execute('SELECT * FROM journals'):
-
+        #Логинимся
         lj = liveJournalBot.LJbot(journal['login'], journal['password'])
+        #Удаляем старых друзей
+        for user in connection.cursor().execute(friendsSql, (journal['journal_id'],)):
+            try:
+                lj.delFriend(user['name'])
+                log(u'%s del friend %s(%s) %s(%s)\n' % (datetime.now(),
+                                          journal['login'],
+                                          journal['journal_id'],
+                                          user['name'],
+                                          user['user_id']))
+            except Exception:
+                pass
 
+            connection.execute('DELETE FROM friends where user_id = ?', (user['user_id'],))
+            connection.execute('DELETE FROM users where user_id = ?', (user['user_id'],))
+
+        #И добавляем новых
         for user in connection.cursor().execute(sql):
             dt = date.today().isoformat()
             try:

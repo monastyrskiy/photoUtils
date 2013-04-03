@@ -284,9 +284,47 @@ class LJbot (object):
         request = urllib2.Request(url, params_encoded)
 
         fp = self.opener.open(request)
-        #fh = open('/home/monastyrskiy/tmp/%s.html' % user, 'w')
+
+        # Полученную страницу с результатом добавления пользователя сохраняем в файл
+        #fh = open('/var/log/livejournal/%s.html' % user, 'w')
         #fh.write(fp.read())
         #fh.close()
+
+        fp.read()
+        fp.close()
+
+    def delFriend(self, user):
+        url = self.urlAddFriend + '?user=%s' % user
+        text = self.openUrlWithCookie(url, self.cookie)
+        remid_match = self.authFormRemIdRe.search(text)
+        auth_match = self.authFormRe.search(text)
+
+        remid = remid_match.group('remid')
+        lj_form_auth = auth_match.group("auth")
+
+        params = {
+            "lj_form_auth": lj_form_auth,
+            "mode": 'add',
+            "action:delete": 'Удалить',
+            "user": user,
+            'remid': remid,
+            'user_note': '',
+            'editfriend_add_1_fg': '#000000',
+            'editfriend_add_1_bg': '#FFFFFF',
+            'friend_tags_mode': 'A',
+            'friend_tags': '',
+        }
+
+        params_encoded = urllib.urlencode(params)
+        request = urllib2.Request(url, params_encoded)
+
+        fp = self.opener.open(request)
+
+        # Полученную страницу с результатом добавления пользователя сохраняем в файл
+        #fh = open('/var/log/livejournal/%s.html' % user, 'w')
+        #fh.write(fp.read())
+        #fh.close()
+
         fp.read()
         fp.close()
 
